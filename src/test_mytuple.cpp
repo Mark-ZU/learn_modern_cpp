@@ -5,7 +5,7 @@ template<typename... Types> class mytuple;
 template<> class mytuple<>{};
 
 template<typename Head,typename... Tail>
-class mytuple<Head,Tail...>:private mytuple<Tail...>{
+class mytuple<Head,Tail...>:public mytuple<Tail...>{
 public:
     mytuple(){}
     mytuple(const Head& head,const Tail&... tail):my_head(head),mytuple<Tail...>(tail...){
@@ -43,6 +43,25 @@ auto get(mytuple<Types...>& t){
     return __get<index,Types...>().get(t);
 }
 
+// get2
+template<int index,typename Head,typename... Tail>
+struct __get_type;
+
+template<typename Head,typename... Tail>
+struct __get_type<0,Head,Tail...>{
+    using type = mytuple<Head,Tail...>;
+};
+
+template<int index,typename Head,typename... Tail>
+struct __get_type{
+    using type = typename __get_type<index-1,Tail...>::type;
+};
+
+template<int index,typename... Types>
+auto get2(mytuple<Types...>& t){
+    return ((typename __get_type<index,Types...>::type) t).head();
+}
+
 int main(){
     auto t = make_mytuple(std::string("abc"),123,1.2,1.4f);
     auto t2 = mytuple<int,double,std::string>(123,1.2,"abc");
@@ -51,4 +70,5 @@ int main(){
     
     // 胡乱实现的，效率很差
     std::cout << get<0>(t) << " " << get<1>(t) << " " << get<3>(t) << std::endl;
+    std::cout << get2<0>(t) << " " << get2<2>(t) << " " << get2<3>(t) << std::endl;
 }
