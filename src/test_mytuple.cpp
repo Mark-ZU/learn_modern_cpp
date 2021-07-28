@@ -10,7 +10,7 @@ public:
     mytuple(){}
     mytuple(const Head& head,const Tail&... tail):my_head(head),mytuple<Tail...>(tail...){
     }
-    Head head(){ return my_head; }
+    Head& head(){ return my_head; }
     mytuple<Tail...>& tail(){ return *this; }
 protected:
     Head my_head;
@@ -26,20 +26,20 @@ struct __get;
 
 template<typename... Types>
 struct __get<0,Types...>{
-    auto get(mytuple<Types...>& t){
+    decltype(auto) get(mytuple<Types...>& t){
         return t.head();
     }
 };
 
 template<int index,typename Head,typename... Tail>
 struct __get<index,Head,Tail...>{
-    auto get(mytuple<Head,Tail...>& t){
+    decltype(auto) get(mytuple<Head,Tail...>& t){
         return __get<index-1,Tail...>().get(t.tail());
     }
 };
 
 template<int index,typename... Types>
-auto get(mytuple<Types...>& t){
+decltype(auto) get(mytuple<Types...>& t){
     return __get<index,Types...>().get(t);
 }
 
@@ -58,17 +58,25 @@ struct __get_type{
 };
 
 template<int index,typename... Types>
-auto get2(mytuple<Types...>& t){
-    return ((typename __get_type<index,Types...>::type) t).head();
+decltype(auto) get2(mytuple<Types...>& t){
+    return ((typename __get_type<index,Types...>::type&) t).head();
 }
 
 int main(){
-    auto t = make_mytuple(std::string("abc"),123,1.2,1.4f);
-    auto t2 = mytuple<int,double,std::string>(123,1.2,"abc");
-    std::cout << t.head() << std::endl;
-    std::cout << t2.head() << std::endl;
+    auto t = make_mytuple(std::string("hello"),123,1.2,1.4f);
+    auto t2 = mytuple<int,double,std::string>(123,1.2,"world");
     
-    // 胡乱实现的，效率很差
-    std::cout << get<0>(t) << " " << get<1>(t) << " " << get<3>(t) << std::endl;
-    std::cout << get2<0>(t) << " " << get2<2>(t) << " " << get2<3>(t) << std::endl;
+    t.head() = std::string("newstr");
+    // bad
+    std::cout << "get : " << get<0>(t) << " " << get<1>(t) << " " << get<3>(t) << std::endl;
+    // good
+    std::cout << "get2 : " << get2<0>(t2) << " " <<  get2<1>(t2) << " " << get2<2>(t2) << std::endl;
+
+    
+    get2<2>(t2) = get2<0>(t);
+    get<1>(t2) = get<3>(t);
+    get2<1>(t2) = 3.1415;
+
+    std::cout << "aftr assign : " << get2<0>(t) << " == " << get2<2>(t2) << std::endl;
+    std::cout << "aftr assign : " << get2<1>(t2) << " != " << get2<3>(t) << std::endl;
 }
