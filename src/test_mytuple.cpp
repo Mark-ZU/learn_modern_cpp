@@ -24,9 +24,9 @@ auto make_mytuple(const Types&... args){
 template<int index,typename... Types>
 struct __get;
 
-template<typename... Types>
-struct __get<0,Types...>{
-    decltype(auto) get(mytuple<Types...>& t){
+template<typename Head,typename... Tail>
+struct __get<0,Head,Tail...>{
+    decltype(auto) get(mytuple<Head,Tail...>& t){
         return t.head();
     }
 };
