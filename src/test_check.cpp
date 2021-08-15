@@ -41,6 +41,7 @@ void check_f(const char name[]){
 }
 
 int main(){
+    check_f<int>("i");
     check_f<A>("A");
     check_f<B>("B");
     check_f<C>("C");
