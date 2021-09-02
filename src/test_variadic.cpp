@@ -27,8 +27,7 @@ auto sum(Ts... t){
     return res;
 }
 
-template<typename... Ts>
-auto sum2(Ts... t){
+auto sum2(auto... t){
     return (t+...);
 }
 

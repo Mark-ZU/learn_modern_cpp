@@ -12,6 +12,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(IGNORE_FILE_LIST
 )
 
+find_package(Threads REQUIRED)
+
 file( GLOB APP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp )
 foreach( sourcefile ${APP_SOURCES} )
     file(RELATIVE_PATH filename ${CMAKE_CURRENT_SOURCE_DIR}/src ${sourcefile})
@@ -21,6 +23,5 @@ foreach( sourcefile ${APP_SOURCES} )
     endif()
     string( REPLACE ".cpp" "" file ${filename} )
     add_executable( ${file} ${sourcefile} )
-    # Make sure YourLib is linked to each app
-    # target_link_libraries( ${file} YourLib )
+    target_link_libraries( ${file} PRIVATE Threads::Threads )
 endforeach( sourcefile ${APP_SOURCES} )
