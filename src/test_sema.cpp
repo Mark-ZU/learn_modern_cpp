@@ -1,4 +1,3 @@
-#include <semaphore>
 #include <iostream>
 #include <fmt/core.h>
 #include <source_location>
@@ -6,7 +5,19 @@
 #include <string_view>
 #include <thread>
 #include <chrono>
-using namespace std::chrono_literals;
+
+#define ZSPLUGIN_DEBUG
+#define use_custom_sema
+
+#ifdef use_custom_sema
+#include "utils/zsplugin.hpp"
+using Semaphore = SemaphoreM;
+#else
+#include <semaphore>
+using Semaphore = std::counting_semaphore;
+#endif // def use_custom_sema
+
+    using namespace std::chrono_literals;
 template<typename... Ts>
 struct log{
     log(std::string_view s,Ts&&... ts,const std::source_location& lo=std::source_location::current()){
@@ -16,7 +27,7 @@ struct log{
 };
 template<typename... Ts> log(std::string_view s,Ts&&... ts) -> log<Ts...>;
 
-std::counting_semaphore s(0);
+Semaphore s(0);
 
 void pong(){
     static int count=0;
