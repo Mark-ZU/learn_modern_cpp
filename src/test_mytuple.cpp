@@ -73,4 +73,5 @@ int main(){
 
     std::cout << "aftr assign : " << get2<0>(t) << " == " << get2<2>(t2) << std::endl;
     std::cout << "aftr assign : " << get2<1>(t2) << " != " << get2<3>(t) << std::endl;
+    std::cout << "size : " << sizeof(mytuple<long,double>) << std::endl;
 }
