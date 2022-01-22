@@ -37,8 +37,30 @@ void test2(){
     MyString s3(std::move(s1));
 }
 
+struct A{
+    int a;
+};
+void f(A&&){ cout << "f A&&" << endl; }
+void f(A&){ cout << "f A&" << endl; }
+void f(const A&){ cout << "f const A&" << endl; }
+void hello(A&& a){ cout << "hello A&&" << endl; f(std::forward<A>(a)); }
+void hello(const A& a){ cout << "hello A&" << endl; f(a); }
+
+void test3(){
+    cout << "\ntest3 : " << endl;
+    auto a = A{};
+    auto&& b = A{};
+    cout << "B==A&  " << (std::is_same_v<decltype(b),A&>) << "\n";
+    cout << "B==A&& " << (std::is_same_v<decltype(b),A&&>) << "\n";
+    hello(a);
+    hello(b);
+    hello(std::move(a));
+    hello(A{});
+}
+
 int main(){
     test();
     test2();
+    test3();
     return 0;
 }

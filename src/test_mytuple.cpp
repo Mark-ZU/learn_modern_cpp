@@ -21,20 +21,14 @@ auto make_mytuple(const Types&... args){
     return mytuple<Types...>(args...);
 }
 
-template<int index,typename... Types>
-struct __get;
-
-template<typename Head,typename... Tail>
-struct __get<0,Head,Tail...>{
-    decltype(auto) get(mytuple<Head,Tail...>& t){
-        return t.head();
-    }
-};
-
 template<int index,typename Head,typename... Tail>
-struct __get<index,Head,Tail...>{
+struct __get{
     decltype(auto) get(mytuple<Head,Tail...>& t){
-        return __get<index-1,Tail...>().get(t.tail());
+        if constexpr(index == 0){
+            return t.head();
+        }else{
+            return __get<index-1,Tail...>().get(t.tail());
+        }
     }
 };
 
@@ -79,4 +73,5 @@ int main(){
 
     std::cout << "aftr assign : " << get2<0>(t) << " == " << get2<2>(t2) << std::endl;
     std::cout << "aftr assign : " << get2<1>(t2) << " != " << get2<3>(t) << std::endl;
+    std::cout << "size : " << sizeof(mytuple<long,double>) << std::endl;
 }
